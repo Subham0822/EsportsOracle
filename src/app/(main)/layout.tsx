@@ -10,6 +10,8 @@ import {
   SidebarTrigger,
   SidebarInset,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { ValorantIcon, CsgoIcon, PubgIcon, LolIcon } from "@/app/components/icons";
 
@@ -35,42 +37,34 @@ export default function MainLayout({
                 <span>Dashboard</span>
               </Link>
             </SidebarMenuItem>
-            <SidebarMenuItem>
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Valorant</p>
-            </SidebarMenuItem>
-             <SidebarMenuItem>
-                <Link href="/valorant/team-vs-team" className="flex items-center gap-2">
-                    <ValorantIcon className="w-4 h-4" />
-                    <span>Team vs Team</span>
-                </Link>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">CS:GO</p>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <Link href="/csgo/team-vs-team" className="flex items-center gap-2">
-                    <CsgoIcon className="w-4 h-4" />
-                    <span>Team vs Team</span>
-                </Link>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                 <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">PUBG</p>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <Link href="/pubg/player-placement" className="flex items-center gap-2">
-                    <PubgIcon className="w-4 h-4" />
-                    <span>Player Placement</span>
-                </Link>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">League of Legends</p>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <Link href="/league-of-legends/match-prediction" className="flex items-center gap-2">
-                    <LolIcon className="w-4 h-4" />
-                    <span>Match Prediction</span>
-                </Link>
-            </SidebarMenuItem>
+
+            <SidebarGroup>
+                <SidebarGroupLabel>Games</SidebarGroupLabel>
+                <SidebarMenuItem>
+                    <Link href="/valorant/team-vs-team" className="flex items-center gap-2">
+                        <ValorantIcon className="w-4 h-4" />
+                        <span>Valorant</span>
+                    </Link>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                    <Link href="/csgo/team-vs-team" className="flex items-center gap-2">
+                        <CsgoIcon className="w-4 h-4" />
+                        <span>CS:GO</span>
+                    </Link>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                    <Link href="/pubg/player-placement" className="flex items-center gap-2">
+                        <PubgIcon className="w-4 h-4" />
+                        <span>PUBG</span>
+                    </Link>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                    <Link href="/league-of-legends/match-prediction" className="flex items-center gap-2">
+                        <LolIcon className="w-4 h-4" />
+                        <span>League of Legends</span>
+                    </Link>
+                </SidebarMenuItem>
+            </SidebarGroup>
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
