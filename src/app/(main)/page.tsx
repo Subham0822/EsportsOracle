@@ -13,12 +13,6 @@ import { Gamepad2 } from "lucide-react";
 
 const tools = [
   {
-    title: "Valorant Single Team",
-    description: "Predict a team's win probability.",
-    href: "/valorant/single-team",
-    icon: <ValorantIcon className="w-8 h-8 text-primary" />,
-  },
-  {
     title: "Valorant Team vs Team",
     description: "Predict the winner of a match.",
     href: "/valorant/team-vs-team",

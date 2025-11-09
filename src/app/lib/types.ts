@@ -1,12 +1,5 @@
 import { z } from 'zod';
 
-export const ValorantSingleTeamSchema = z.object({
-    kdr: z.coerce.number().min(0, "K/D Ratio must be positive"),
-    winRate: z.coerce.number().min(0, "Win Rate must be positive").max(100, "Win Rate cannot exceed 100"),
-    acs: z.coerce.number().min(0, "ACS must be positive"),
-    firstBloods: z.coerce.number().min(0, "First Bloods must be positive"),
-});
-
 export const TeamStatsSchema = z.object({
     kdr: z.coerce.number().min(0, "K/D Ratio must be positive"),
     winRate: z.coerce.number().min(0).max(100),

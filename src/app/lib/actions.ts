@@ -2,7 +2,7 @@
 
 import { generateTeamNames } from '@/ai/flows/generate-team-names';
 import { z } from 'zod';
-import { TeamNameGeneratorSchema, ValorantSingleTeamSchema, ValorantTeamVsTeamSchema, CsgoTeamVsTeamSchema, PubgPlayerPlacementSchema, LolMatchPredictionSchema } from './types';
+import { TeamNameGeneratorSchema, ValorantTeamVsTeamSchema, CsgoTeamVsTeamSchema, PubgPlayerPlacementSchema, LolMatchPredictionSchema } from './types';
 
 // Helper function to simulate network delay
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -25,32 +25,6 @@ export async function generateTeamNameAction(
     return { teamName: result.teamName, error: null };
   } catch (error) {
     return { teamName: null, error: 'Failed to generate team name. Please try again.' };
-  }
-}
-
-// Valorant Single Team Prediction Action (Mock)
-export async function valorantSingleTeamAction(
-  prevState: { winProbability: number | null; error: string | null },
-  formData: FormData
-) {
-  await sleep(1500);
-  try {
-    const validatedFields = ValorantSingleTeamSchema.safeParse({
-      kdr: formData.get('kdr'),
-      winRate: formData.get('winRate'),
-      acs: formData.get('acs'),
-      firstBloods: formData.get('firstBloods'),
-    });
-
-    if (!validatedFields.success) {
-      return { winProbability: null, error: 'Invalid input. Please check your numbers.' };
-    }
-    
-    // Mock logic
-    const winProbability = Math.random() * (95 - 40) + 40;
-    return { winProbability, error: null };
-  } catch (error) {
-    return { winProbability: null, error: 'Prediction failed. Please try again.' };
   }
 }
 

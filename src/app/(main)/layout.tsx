@@ -39,12 +39,6 @@ export default function MainLayout({
                 <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Valorant</p>
             </SidebarMenuItem>
              <SidebarMenuItem>
-                <Link href="/valorant/single-team" className="flex items-center gap-2">
-                    <ValorantIcon className="w-4 h-4" />
-                    <span>Single Team Prediction</span>
-                </Link>
-            </SidebarMenuItem>
-             <SidebarMenuItem>
                 <Link href="/valorant/team-vs-team" className="flex items-center gap-2">
                     <ValorantIcon className="w-4 h-4" />
                     <span>Team vs Team</span>
