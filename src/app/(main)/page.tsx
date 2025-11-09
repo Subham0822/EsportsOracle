@@ -49,60 +49,39 @@ export default function DashboardPage() {
     const heroImage = PlaceHolderImages.find(p => p.id === 'hero');
 
   return (
-    <div className="space-y-12">
-      <div className="relative rounded-xl overflow-hidden shadow-2xl">
-        {heroImage && (
-             <Image
-                src={heroImage.imageUrl}
-                alt={heroImage.description}
-                data-ai-hint={heroImage.imageHint}
-                width={1600}
-                height={600}
-                className="w-full h-[400px] object-cover"
-                priority
-            />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background to-background/20" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-neutral-300">
-              Esports Oracle
-            </h1>
-            <p className="mt-4 text-lg md:text-xl text-white/80 max-w-2xl">
-                Leverage the power of AI to get predictions and insights for your favorite esports titles.
-            </p>
-            <Button asChild className="mt-8" size="lg">
-                <Link href="/valorant/team-vs-team">Get Started <ArrowRight className="ml-2" /></Link>
-            </Button>
-        </div>
+    <div className="space-y-8">
+      <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <Gamepad2 className="w-8 h-8 text-muted-foreground" />
+            <h1 className="text-4xl font-bold tracking-tight">Welcome to Esports Oracle</h1>
+          </div>
+          <p className="text-muted-foreground max-w-2xl">
+            Leverage the power of AI to get predictions and insights for your favorite esports titles. Select a tool below to get started.
+          </p>
       </div>
       
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight mb-6">Prediction Tools</h2>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {tools.map((tool) => (
-            <Link href={tool.href} key={tool.title}>
-              <Card className="h-full group hover:border-primary transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                <CardHeader>
-                  <div className="flex items-center gap-4">
-                     <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                        {tool.icon}
-                    </div>
-                    <CardTitle>{tool.title}</CardTitle>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {tools.map((tool) => (
+          <Link href={tool.href} key={tool.title} className="group">
+            <Card className="h-full hover:border-primary/60 transition-colors duration-300 hover:shadow-lg hover:-translate-y-1">
+              <CardHeader>
+                <div className="flex items-start justify-between gap-4">
+                   <div className="p-3 bg-muted rounded-lg">
+                      {tool.icon}
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>{tool.description}</CardDescription>
-                </CardContent>
-                 <CardContent>
-                  <div className="flex items-center text-sm font-medium text-primary group-hover:translate-x-1 transition-transform">
+                  <div className="flex items-center text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">
                     <span>Use Tool</span>
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowRight className="ml-1 h-3 w-3" />
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-1">
+                <CardTitle className="text-lg">{tool.title}</CardTitle>
+                <CardDescription>{tool.description}</CardDescription>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
       </div>
     </div>
   );
