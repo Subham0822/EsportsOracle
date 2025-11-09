@@ -3,7 +3,7 @@ import { useActionState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SubmitButton } from "@/components/submit-button";
+import { SubmitButton } from "@/app/components/submit-button";
 import { generateTeamNameAction } from '@/app/lib/actions';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
