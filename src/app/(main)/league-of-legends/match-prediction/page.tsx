@@ -1,5 +1,5 @@
 'use client';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react';
 import { lolMatchPredictionAction } from '@/app/lib/actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -39,7 +39,7 @@ function PredictionResult({ state }: { state: typeof initialState }) {
 }
 
 export default function LolMatchPredictionPage() {
-  const [state, formAction] = useFormState(lolMatchPredictionAction, initialState);
+  const [state, formAction] = useActionState(lolMatchPredictionAction, initialState);
   
   const teamFields = [
       { name: "Dragons", id: "Dragons", max: 4, placeholder: "e.g., 2" },

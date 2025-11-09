@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import { pubgPlayerPlacementAction } from '@/app/lib/actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -36,7 +36,7 @@ function PredictionResult({ state }: { state: typeof initialState }) {
 }
 
 export default function PubgPlayerPlacementPage() {
-  const [state, formAction] = useFormState(pubgPlayerPlacementAction, initialState);
+  const [state, formAction] = useActionState(pubgPlayerPlacementAction, initialState);
 
   return (
     <div className="max-w-2xl mx-auto">

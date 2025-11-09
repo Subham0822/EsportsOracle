@@ -1,9 +1,9 @@
 'use client';
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SubmitButton } from "@/app/components/submit-button";
+import { SubmitButton } from "@/components/submit-button";
 import { generateTeamNameAction } from '@/app/lib/actions';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 const initialState = { teamName: null, error: null };
 
 export function TeamNameGenerator() {
-  const [state, formAction] = useFormState(generateTeamNameAction, initialState);
+  const [state, formAction] = useActionState(generateTeamNameAction, initialState);
   const { toast } = useToast();
 
   useEffect(() => {

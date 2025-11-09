@@ -1,5 +1,5 @@
 'use client';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react';
 import { valorantTeamVsTeamAction } from '@/app/lib/actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -74,7 +74,7 @@ function PredictionResult({ state, formData }: { state: typeof initialState, for
 }
 
 export default function ValorantTeamVsTeamPage() {
-  const [state, formAction] = useFormState(valorantTeamVsTeamAction, initialState);
+  const [state, formAction] = useActionState(valorantTeamVsTeamAction, initialState);
   const [formData, setFormData] = useState<FormData | null>(null);
 
   const handleAction = (payload: FormData) => {
