@@ -5,6 +5,7 @@ import { csgoTeamVsTeamAction } from '@/app/lib/actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
 import { SubmitButton } from '@/app/components/submit-button';
 import { TeamNameGenerator } from '@/app/components/team-name-generator';
 import { useEffect, useState } from 'react';
@@ -15,13 +16,12 @@ import { ChartContainer } from '@/components/ui/chart';
 const initialState = { winner: null, error: null };
 
 const chartConfig = {
-  kdr: { label: "K/D Ratio" },
-  winRate: { label: "Win Rate" },
-  acs: { label: "Rating 2.0" }, // For CSGO, let's pretend ACS is Rating 2.0
-  adr: { label: "ADR" },
-  hsRate: { label: "HS%" },
-  teamA: { label: "Team A", color: "hsl(var(--chart-1))" },
-  teamB: { label: "Team B", color: "hsl(var(--chart-2))" },
+  avg_money: { label: "Avg Economy" },
+  round_win_rate: { label: "Round Win Rate" },
+  ct_rounds: { label: "CT Rounds" },
+  t_rounds: { label: "T Rounds" },
+  team1: { label: "Team 1", color: "hsl(var(--chart-1))" },
+  team2: { label: "Team 2", color: "hsl(var(--chart-2))" },
 };
 
 function PredictionResult({ state, formData }: { state: typeof initialState, formData: FormData | null }) {
@@ -41,16 +41,15 @@ function PredictionResult({ state, formData }: { state: typeof initialState, for
     }
     
     if (state.winner && formData) {
-        const teamAName = formData.get('teamA.name') || 'Team A';
-        const teamBName = formData.get('teamB.name') || 'Team B';
-        const winnerName = state.winner === 'teamA' ? teamAName : teamBName;
+        const team1Name = formData.get('team1.name') || 'Team 1';
+        const team2Name = formData.get('team2.name') || 'Team 2';
+        const winnerName = state.winner === 'teamA' ? team1Name : team2Name;
         
         const chartData = [
-            { stat: 'kdr', teamA: Number(formData.get('teamA.kdr')), teamB: Number(formData.get('teamB.kdr')) },
-            { stat: 'winRate', teamA: Number(formData.get('teamA.winRate')), teamB: Number(formData.get('teamB.winRate')) },
-            { stat: 'acs', teamA: Number(formData.get('teamA.acs')), teamB: Number(formData.get('teamB.acs')) },
-            { stat: 'adr', teamA: Number(formData.get('teamA.adr')), teamB: Number(formData.get('teamB.adr')) },
-            { stat: 'hsRate', teamA: Number(formData.get('teamA.hsRate')), teamB: Number(formData.get('teamB.hsRate')) },
+            { stat: 'avg_money', team1: Number(formData.get('team1.avg_money')), team2: Number(formData.get('team2.avg_money')) },
+            { stat: 'round_win_rate', team1: Number(formData.get('team1.round_win_rate')), team2: Number(formData.get('team2.round_win_rate')) },
+            { stat: 'ct_rounds', team1: Number(formData.get('team1.ct_rounds')), team2: Number(formData.get('team2.ct_rounds')) },
+            { stat: 't_rounds', team1: Number(formData.get('team1.t_rounds')), team2: Number(formData.get('team2.t_rounds')) },
         ];
         
         return (
@@ -61,8 +60,8 @@ function PredictionResult({ state, formData }: { state: typeof initialState, for
                         <RadarChart data={chartData}>
                         <PolarGrid />
                         <PolarAngleAxis dataKey="stat" tick={({ payload, x, y, textAnchor }) => (<text x={x} y={y} textAnchor={textAnchor} fill="hsl(var(--foreground))" fontSize={12}>{chartConfig[payload.value as keyof typeof chartConfig].label}</text>)} />
-                        <Radar name={teamAName.toString()} dataKey="teamA" stroke="var(--color-teamA)" fill="var(--color-teamA)" fillOpacity={0.6} />
-                        <Radar name={teamBName.toString()} dataKey="teamB" stroke="var(--color-teamB)" fill="var(--color-teamB)" fillOpacity={0.6} />
+                        <Radar name={team1Name.toString()} dataKey="team1" stroke="var(--color-team1)" fill="var(--color-team1)" fillOpacity={0.6} />
+                        <Radar name={team2Name.toString()} dataKey="team2" stroke="var(--color-team2)" fill="var(--color-team2)" fillOpacity={0.6} />
                         <Legend />
                         </RadarChart>
                     </ResponsiveContainer>
@@ -84,12 +83,20 @@ export default function CsgoTeamVsTeamPage() {
   }
   
   const teamFields = [
-      { name: "kdr", label: "K/D Ratio", placeholder: "1.05", type: "number", step: "0.01" },
-      { name: "winRate", label: "Win Rate (%)", placeholder: "52", type: "number", step: "0.1" },
-      { name: "acs", label: "HLTV Rating 2.0", placeholder: "1.08", type: "number", step: "0.01" },
-      { name: "adr", label: "Avg Damage/Round", placeholder: "78.2", type: "number", step: "0.1" },
-      { name: "hsRate", label: "Headshot %", placeholder: "45.1", type: "number", step: "0.1" },
+      { name: "rank", label: "Rank (lower = better)", defaultValue: 50, min: 1, max: 200, step: 1 },
+      { name: "avg_money", label: "Average Economy", defaultValue: 7500, min: 0, max: 20000, step: 100 },
+      { name: "round_win_rate", label: "Round Win Rate (0-1)", defaultValue: 0.5, min: 0, max: 1, step: 0.01 },
+      { name: "ct_rounds", label: "Rounds Won as CT", defaultValue: 8, min: 0, max: 30, step: 1 },
+      { name: "t_rounds", label: "Rounds Won as T", defaultValue: 7, min: 0, max: 30, step: 1 },
   ]
+  
+  // Initialize state for both teams
+  const [team1Values, setTeam1Values] = useState<Record<string, number>>(
+    Object.fromEntries(teamFields.map(f => [f.name, f.defaultValue]))
+  );
+  const [team2Values, setTeam2Values] = useState<Record<string, number>>(
+    Object.fromEntries(teamFields.map(f => [f.name, f.defaultValue]))
+  );
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -100,32 +107,58 @@ export default function CsgoTeamVsTeamPage() {
             <form action={handleAction}>
                 <Card>
                 <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Team A */}
+                    {/* Team 1 */}
                     <div className="space-y-4">
-                        <h3 className="text-xl font-semibold">Team A</h3>
+                        <h3 className="text-xl font-semibold">Team 1</h3>
                         <div className="space-y-2">
-                            <Label htmlFor="teamA.name">Team Name</Label>
-                            <Input id="teamA.name" name="teamA.name" placeholder="e.g., Astralis" defaultValue="Team A" />
+                            <Label htmlFor="team1.name">Team Name</Label>
+                            <Input id="team1.name" name="team1.name" placeholder="e.g., Astralis" defaultValue="Team 1" />
                         </div>
                         {teamFields.map(field => (
-                             <div className="space-y-2" key={`teamA-${field.name}`}>
-                                <Label htmlFor={`teamA.${field.name}`}>{field.label}</Label>
-                                <Input id={`teamA.${field.name}`} name={`teamA.${field.name}`} type={field.type} step={field.step} placeholder={field.placeholder} required />
+                             <div className="space-y-2" key={`team1-${field.name}`}>
+                                <div className="flex justify-between items-center">
+                                    <Label htmlFor={`team1.${field.name}`}>{field.label}</Label>
+                                    <span className="text-sm font-medium text-primary">{team1Values[field.name].toFixed(field.step < 1 ? 2 : 0)}</span>
+                                </div>
+                                <Slider
+                                    id={`team1.${field.name}`}
+                                    name={`team1.${field.name}`}
+                                    min={field.min}
+                                    max={field.max}
+                                    step={field.step}
+                                    value={[team1Values[field.name]]}
+                                    onValueChange={(value) => setTeam1Values(prev => ({ ...prev, [field.name]: value[0] }))}
+                                    className="w-full"
+                                />
+                                <input type="hidden" name={`team1.${field.name}`} value={team1Values[field.name]} />
                             </div>
                         ))}
                     </div>
 
-                    {/* Team B */}
+                    {/* Team 2 */}
                     <div className="space-y-4">
-                        <h3 className="text-xl font-semibold">Team B</h3>
+                        <h3 className="text-xl font-semibold">Team 2</h3>
                          <div className="space-y-2">
-                            <Label htmlFor="teamB.name">Team Name</Label>
-                            <Input id="teamB.name" name="teamB.name" placeholder="e.g., Natus Vincere" defaultValue="Team B" />
+                            <Label htmlFor="team2.name">Team Name</Label>
+                            <Input id="team2.name" name="team2.name" placeholder="e.g., Natus Vincere" defaultValue="Team 2" />
                         </div>
                         {teamFields.map(field => (
-                             <div className="space-y-2" key={`teamB-${field.name}`}>
-                                <Label htmlFor={`teamB.${field.name}`}>{field.label}</Label>
-                                <Input id={`teamB.${field.name}`} name={`teamB.${field.name}`} type={field.type} step={field.step} placeholder={field.placeholder} required />
+                             <div className="space-y-2" key={`team2-${field.name}`}>
+                                <div className="flex justify-between items-center">
+                                    <Label htmlFor={`team2.${field.name}`}>{field.label}</Label>
+                                    <span className="text-sm font-medium text-primary">{team2Values[field.name].toFixed(field.step < 1 ? 2 : 0)}</span>
+                                </div>
+                                <Slider
+                                    id={`team2.${field.name}`}
+                                    name={`team2.${field.name}`}
+                                    min={field.min}
+                                    max={field.max}
+                                    step={field.step}
+                                    value={[team2Values[field.name]]}
+                                    onValueChange={(value) => setTeam2Values(prev => ({ ...prev, [field.name]: value[0] }))}
+                                    className="w-full"
+                                />
+                                <input type="hidden" name={`team2.${field.name}`} value={team2Values[field.name]} />
                             </div>
                         ))}
                     </div>

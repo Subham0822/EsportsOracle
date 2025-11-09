@@ -4,9 +4,10 @@ import { useFormStatus } from 'react-dom';
 import { lolMatchPredictionAction } from '@/app/lib/actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
 import { SubmitButton } from '@/app/components/submit-button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useState } from 'react';
 
 const initialState = { winner: null, error: null };
 
@@ -39,14 +40,24 @@ function PredictionResult({ state }: { state: typeof initialState }) {
     return null;
 }
 
+const teamFields = [
+    { name: "Tower Kills", id: "TowerKills", defaultValue: 5, min: 0, max: 11, step: 1 },
+    { name: "Inhibitor Kills", id: "InhibitorKills", defaultValue: 1, min: 0, max: 5, step: 1 },
+    { name: "Baron Kills", id: "BaronKills", defaultValue: 0, min: 0, max: 5, step: 1 },
+    { name: "Dragon Kills", id: "DragonKills", defaultValue: 2, min: 0, max: 7, step: 1 },
+    { name: "Rift Herald Kills", id: "RiftHeraldKills", defaultValue: 1, min: 0, max: 3, step: 1 },
+];
+
 export default function LolMatchPredictionPage() {
   const [state, formAction] = useActionState(lolMatchPredictionAction, initialState);
   
-  const teamFields = [
-      { name: "Dragons", id: "Dragons", max: 4, placeholder: "e.g., 2" },
-      { name: "Barons", id: "Barons", max: 5, placeholder: "e.g., 1" },
-      { name: "Turrets", id: "Turrets", max: 11, placeholder: "e.g., 7" },
-  ];
+  // Initialize state for both teams
+  const [team1Values, setTeam1Values] = useState<Record<string, number>>(
+    Object.fromEntries(teamFields.map(f => [f.id, f.defaultValue]))
+  );
+  const [team2Values, setTeam2Values] = useState<Record<string, number>>(
+    Object.fromEntries(teamFields.map(f => [f.id, f.defaultValue]))
+  );
   
   return (
     <div className="max-w-4xl mx-auto">
@@ -65,8 +76,21 @@ export default function LolMatchPredictionPage() {
                         <h3 className="text-xl font-semibold text-blue-400">Team 1 (Blue Side)</h3>
                         {teamFields.map(field => (
                              <div className="space-y-2" key={`team1-${field.id}`}>
-                                <Label htmlFor={`team1${field.id}`}>{field.name}</Label>
-                                <Input id={`team1${field.id}`} name={`team1${field.id}`} type="number" min="0" max={field.max} placeholder={field.placeholder} required />
+                                <div className="flex justify-between items-center">
+                                    <Label htmlFor={`team1${field.id}`}>{field.name}</Label>
+                                    <span className="text-sm font-medium text-primary">{team1Values[field.id]}</span>
+                                </div>
+                                <Slider
+                                    id={`team1${field.id}`}
+                                    name={`team1${field.id}`}
+                                    min={field.min}
+                                    max={field.max}
+                                    step={field.step}
+                                    value={[team1Values[field.id]]}
+                                    onValueChange={(value) => setTeam1Values(prev => ({ ...prev, [field.id]: value[0] }))}
+                                    className="w-full"
+                                />
+                                <input type="hidden" name={`team1${field.id}`} value={team1Values[field.id]} />
                             </div>
                         ))}
                     </div>
@@ -76,8 +100,21 @@ export default function LolMatchPredictionPage() {
                         <h3 className="text-xl font-semibold text-red-400">Team 2 (Red Side)</h3>
                         {teamFields.map(field => (
                              <div className="space-y-2" key={`team2-${field.id}`}>
-                                <Label htmlFor={`team2${field.id}`}>{field.name}</Label>
-                                <Input id={`team2${field.id}`} name={`team2${field.id}`} type="number" min="0" max={field.max} placeholder={field.placeholder} required />
+                                <div className="flex justify-between items-center">
+                                    <Label htmlFor={`team2${field.id}`}>{field.name}</Label>
+                                    <span className="text-sm font-medium text-primary">{team2Values[field.id]}</span>
+                                </div>
+                                <Slider
+                                    id={`team2${field.id}`}
+                                    name={`team2${field.id}`}
+                                    min={field.min}
+                                    max={field.max}
+                                    step={field.step}
+                                    value={[team2Values[field.id]]}
+                                    onValueChange={(value) => setTeam2Values(prev => ({ ...prev, [field.id]: value[0] }))}
+                                    className="w-full"
+                                />
+                                <input type="hidden" name={`team2${field.id}`} value={team2Values[field.id]} />
                             </div>
                         ))}
                     </div>

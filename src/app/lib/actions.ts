@@ -1,11 +1,17 @@
-'use server';
+"use server";
 
-import { generateTeamNames } from '@/ai/flows/generate-team-names';
-import { z } from 'zod';
-import { TeamNameGeneratorSchema, ValorantTeamVsTeamSchema, CsgoTeamVsTeamSchema, PubgPlayerPlacementSchema, LolMatchPredictionSchema } from './types';
+import { generateTeamNames } from "@/ai/flows/generate-team-names";
+import { z } from "zod";
+import {
+  TeamNameGeneratorSchema,
+  ValorantTeamVsTeamSchema,
+  CsgoTeamVsTeamSchema,
+  PubgPlayerPlacementSchema,
+  LolMatchPredictionSchema,
+} from "./types";
 
-// Helper function to simulate network delay
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+// Backend API URL - adjust if needed
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Team Name Generator Action
 export async function generateTeamNameAction(
@@ -14,109 +20,193 @@ export async function generateTeamNameAction(
 ) {
   try {
     const validatedFields = TeamNameGeneratorSchema.safeParse({
-      styleDescription: formData.get('styleDescription'),
+      styleDescription: formData.get("styleDescription"),
     });
 
     if (!validatedFields.success) {
-      return { teamName: null, error: validatedFields.error.flatten().fieldErrors.styleDescription?.[0] || 'Invalid input.' };
+      return {
+        teamName: null,
+        error:
+          validatedFields.error.flatten().fieldErrors.styleDescription?.[0] ||
+          "Invalid input.",
+      };
     }
 
     const result = await generateTeamNames(validatedFields.data);
     return { teamName: result.teamName, error: null };
   } catch (error) {
-    return { teamName: null, error: 'Failed to generate team name. Please try again.' };
+    return {
+      teamName: null,
+      error: "Failed to generate team name. Please try again.",
+    };
   }
 }
 
-// Valorant Team vs Team Prediction Action (Mock)
+// Valorant Team vs Team Prediction Action
 export async function valorantTeamVsTeamAction(
-  prevState: { winner: 'teamA' | 'teamB' | null; error: string | null },
+  prevState: { winner: "teamA" | "teamB" | null; error: string | null },
   formData: FormData
 ) {
-    await sleep(1500);
-    try {
-        const teamA_kdr = formData.get('teamA.kdr');
-        const teamB_kdr = formData.get('teamB.kdr');
-        // Simple mock logic: higher KDR wins
-        const winner = Number(teamA_kdr) > Number(teamB_kdr) ? 'teamA' : 'teamB';
-        return { winner, error: null };
-    } catch (error) {
-        return { winner: null, error: 'Prediction failed. Please try again.' };
+  try {
+    const team1 = {
+      rating: Number(formData.get("team1.rating")),
+      acs: Number(formData.get("team1.acs")),
+      k: Number(formData.get("team1.k")),
+      d: Number(formData.get("team1.d")),
+      a: Number(formData.get("team1.a")),
+      tkmd: Number(formData.get("team1.tkmd")),
+      kast: Number(formData.get("team1.kast")),
+      adr: Number(formData.get("team1.adr")),
+      hs: Number(formData.get("team1.hs")),
+      fk: Number(formData.get("team1.fk")),
+      fd: Number(formData.get("team1.fd")),
+      fkmd: Number(formData.get("team1.fkmd")),
+    };
+
+    const team2 = {
+      rating: Number(formData.get("team2.rating")),
+      acs: Number(formData.get("team2.acs")),
+      k: Number(formData.get("team2.k")),
+      d: Number(formData.get("team2.d")),
+      a: Number(formData.get("team2.a")),
+      tkmd: Number(formData.get("team2.tkmd")),
+      kast: Number(formData.get("team2.kast")),
+      adr: Number(formData.get("team2.adr")),
+      hs: Number(formData.get("team2.hs")),
+      fk: Number(formData.get("team2.fk")),
+      fd: Number(formData.get("team2.fd")),
+      fkmd: Number(formData.get("team2.fkmd")),
+    };
+
+    const response = await fetch(`${API_BASE_URL}/api/valorant/vs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ team1, team2 }),
+    });
+
+    if (!response.ok) {
+      throw new Error("API request failed");
     }
+
+    const data = await response.json();
+    const winner = data.winner === "team1" ? "teamA" : "teamB";
+    return { winner, error: null };
+  } catch (error) {
+    return { winner: null, error: "Prediction failed. Please try again." };
+  }
 }
 
-// CS:GO Team vs Team Prediction Action (Mock)
+// CS:GO Team vs Team Prediction Action
 export async function csgoTeamVsTeamAction(
-    prevState: { winner: 'teamA' | 'teamB' | null; error: string | null },
-    formData: FormData
-  ) {
-      await sleep(1500);
-      try {
-          const teamA_adr = formData.get('teamA.adr');
-          const teamB_adr = formData.get('teamB.adr');
-          // Simple mock logic: higher ADR wins
-          const winner = Number(teamA_adr) > Number(teamB_adr) ? 'teamA' : 'teamB';
-          return { winner, error: null };
-      } catch (error) {
-          return { winner: null, error: 'Prediction failed. Please try again.' };
-      }
-  }
+  prevState: { winner: "teamA" | "teamB" | null; error: string | null },
+  formData: FormData
+) {
+  try {
+    const team1 = {
+      rank: Number(formData.get("team1.rank")),
+      avg_money: Number(formData.get("team1.avg_money")),
+      round_win_rate: Number(formData.get("team1.round_win_rate")),
+      ct_rounds: Number(formData.get("team1.ct_rounds")),
+      t_rounds: Number(formData.get("team1.t_rounds")),
+    };
 
-// PUBG Player Placement Prediction Action (Mock)
+    const team2 = {
+      rank: Number(formData.get("team2.rank")),
+      avg_money: Number(formData.get("team2.avg_money")),
+      round_win_rate: Number(formData.get("team2.round_win_rate")),
+      ct_rounds: Number(formData.get("team2.ct_rounds")),
+      t_rounds: Number(formData.get("team2.t_rounds")),
+    };
+
+    const response = await fetch(`${API_BASE_URL}/api/csgo/vs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ team1, team2 }),
+    });
+
+    if (!response.ok) {
+      throw new Error("API request failed");
+    }
+
+    const data = await response.json();
+    const winner = data.winner === "team1" ? "teamA" : "teamB";
+    return { winner, error: null };
+  } catch (error) {
+    return { winner: null, error: "Prediction failed. Please try again." };
+  }
+}
+
+// PUBG Player Placement Prediction Action
 export async function pubgPlayerPlacementAction(
   prevState: { placement: number | null; error: string | null },
   formData: FormData
 ) {
-  await sleep(1500);
   try {
-    const validatedFields = PubgPlayerPlacementSchema.safeParse({
-      kills: formData.get('kills'),
-      damage: formData.get('damage'),
-      survivalTime: formData.get('survivalTime'),
-      revives: formData.get('revives'),
+    const requestData = {
+      walkDistance: Number(formData.get("walkDistance")),
+      boosts: Number(formData.get("boosts")),
+      weaponsAcquired: Number(formData.get("weaponsAcquired")),
+      damageDealt: Number(formData.get("damageDealt")),
+      heals: Number(formData.get("heals")),
+      kills: Number(formData.get("kills")),
+      rideDistance: Number(formData.get("rideDistance")),
+      longestKill: Number(formData.get("longestKill")),
+      DBNOs: Number(formData.get("DBNOs")),
+      killPlace: Number(formData.get("killPlace")),
+    };
+
+    const response = await fetch(`${API_BASE_URL}/api/pubg/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestData),
     });
 
-    if (!validatedFields.success) {
-      return { placement: null, error: 'Invalid input. Please check your numbers.' };
+    if (!response.ok) {
+      throw new Error("API request failed");
     }
-    
-    // Mock logic
-    const placement = Math.random() * (99 - 70) + 70;
-    return { placement, error: null };
+
+    const data = await response.json();
+    return { placement: data.placement, error: null };
   } catch (error) {
-    return { placement: null, error: 'Prediction failed. Please try again.' };
+    return { placement: null, error: "Prediction failed. Please try again." };
   }
 }
 
-// LoL Match Prediction Action (Mock)
+// LoL Match Prediction Action
 export async function lolMatchPredictionAction(
   prevState: { winner: 1 | 2 | null; error: string | null },
   formData: FormData
 ) {
-  await sleep(1500);
   try {
-    const validatedFields = LolMatchPredictionSchema.safeParse({
-        team1Dragons: formData.get('team1Dragons'),
-        team2Dragons: formData.get('team2Dragons'),
-        team1Barons: formData.get('team1Barons'),
-        team2Barons: formData.get('team2Barons'),
-        team1Turrets: formData.get('team1Turrets'),
-        team2Turrets: formData.get('team2Turrets'),
+    const team1 = {
+      towerKills: Number(formData.get("team1TowerKills")),
+      inhibitorKills: Number(formData.get("team1InhibitorKills")),
+      baronKills: Number(formData.get("team1BaronKills")),
+      dragonKills: Number(formData.get("team1DragonKills")),
+      riftHeraldKills: Number(formData.get("team1RiftHeraldKills")),
+    };
+
+    const team2 = {
+      towerKills: Number(formData.get("team2TowerKills")),
+      inhibitorKills: Number(formData.get("team2InhibitorKills")),
+      baronKills: Number(formData.get("team2BaronKills")),
+      dragonKills: Number(formData.get("team2DragonKills")),
+      riftHeraldKills: Number(formData.get("team2RiftHeraldKills")),
+    };
+
+    const response = await fetch(`${API_BASE_URL}/api/lol/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ team1, team2 }),
     });
 
-    if (!validatedFields.success) {
-        return { winner: null, error: 'Invalid input. Please check your numbers.' };
+    if (!response.ok) {
+      throw new Error("API request failed");
     }
 
-    const { team1Dragons, team2Dragons, team1Barons, team2Barons, team1Turrets, team2Turrets } = validatedFields.data;
-
-    // Mock logic
-    let score1 = team1Dragons * 2 + team1Barons * 5 + team1Turrets;
-    let score2 = team2Dragons * 2 + team2Barons * 5 + team2Turrets;
-    
-    const winner = score1 > score2 ? 1 : 2;
-    return { winner, error: null };
+    const data = await response.json();
+    return { winner: data.winner as 1 | 2, error: null };
   } catch (error) {
-    return { winner: null, error: 'Prediction failed. Please try again.' };
+    return { winner: null, error: "Prediction failed. Please try again." };
   }
 }
